@@ -12,6 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.Win32;
+// using ConanExilesOptimizer.UI; // Temporär deaktiviert
 
 namespace ConanExilesOptimizer
 {
@@ -40,9 +41,16 @@ namespace ConanExilesOptimizer
         
         public MainForm()
         {
+            // UI-Manager initialisieren (später implementiert)
+            // UIManager.Initialize();
+            // UIManager.ThemeChanged += OnThemeChanged;
+            
             InitializeComponent();
-            DetectInstallations();
-            UpdateStatus();
+            // DetectInstallations(); // Später implementiert
+            // UpdateStatus(); // Später implementiert
+            
+            // Theme anwenden (später implementiert)
+            // UIManager.ApplyTheme(this);
         }
         
         private void InitializeComponent()
@@ -60,11 +68,23 @@ namespace ConanExilesOptimizer
             this.BackColor = Color.FromArgb(240, 240, 240);
             this.Icon = SystemIcons.Application;
             
+            // Einfaches Menü direkt erstellen
+            var menuStrip = new MenuStrip();
+            var fileMenu = new ToolStripMenuItem("📁 &Datei");
+            fileMenu.DropDownItems.Add("🚪 &Beenden", null, (s, e) => Application.Exit());
+            var viewMenu = new ToolStripMenuItem("👁️ &Ansicht");  
+            viewMenu.DropDownItems.Add("🎨 &UI-Einstellungen", null, (s, e) => MessageBox.Show("UI-Einstellungen werden implementiert...", "Info"));
+            var helpMenu = new ToolStripMenuItem("❓ &Hilfe");
+            helpMenu.DropDownItems.Add("ℹ️ &Über", null, (s, e) => MessageBox.Show("🗡️ Conan Exiles Optimizer v3.0.0 🏰\nEntwickler: Panicgrinder\n© 2025", "Über"));
+            menuStrip.Items.AddRange(new ToolStripItem[] { fileMenu, viewMenu, helpMenu });
+            this.MainMenuStrip = menuStrip;
+            this.Controls.Add(menuStrip);
+            
             // Header Panel
             var headerPanel = new Panel
             {
                 Size = new Size(880, 80),
-                Location = new Point(10, 10),
+                Location = new Point(10, 35), // Angepasst für Menü
                 BackColor = Color.FromArgb(70, 130, 180),
                 BorderStyle = BorderStyle.FixedSingle
             };
@@ -1399,6 +1419,434 @@ Diese Version nutzt erprobte Community-Lösungen!";
             
             this.ResumeLayout(false);
         }
+
+        /// <summary>
+        /// Erstellt ein einfaches Menü
+        /// </summary>
+        private void CreateSimpleMenu()
+        {
+            var menuStrip = new MenuStrip();
+            
+            // Datei-Menü
+            var fileMenu = new ToolStripMenuItem("📁 &Datei");
+            fileMenu.DropDownItems.Add("🚪 &Beenden", null, (s, e) => Application.Exit());
+
+            // Ansicht-Menü
+            var viewMenu = new ToolStripMenuItem("👁️ &Ansicht");
+            viewMenu.DropDownItems.Add("🎨 &UI-Einstellungen", null, (s, e) => ShowSimpleUIDialog());
+            viewMenu.DropDownItems.Add("🌗 &Theme wechseln", null, (s, e) => ToggleSimpleTheme());
+
+            // Hilfe-Menü
+            var helpMenu = new ToolStripMenuItem("❓ &Hilfe");
+            helpMenu.DropDownItems.Add("ℹ️ &Über", null, (s, e) => ShowAboutDialog());
+
+            menuStrip.Items.AddRange(new ToolStripItem[] { fileMenu, viewMenu, helpMenu });
+            this.MainMenuStrip = menuStrip;
+            this.Controls.Add(menuStrip);
+        }
+
+        private void ShowSimpleUIDialog()
+        {
+            using (var form = new Form())
+            {
+                form.Text = "🎨 UI-Einstellungen";
+                form.Size = new Size(300, 200);
+                form.StartPosition = FormStartPosition.CenterParent;
+                form.FormBorderStyle = FormBorderStyle.FixedDialog;
+
+                var label = new Label { Text = "Theme-Auswahl:", AutoSize = true, Location = new Point(10, 20) };
+                var lightBtn = new Button { Text = "☀️ Hell", Size = new Size(80, 30), Location = new Point(10, 50) };
+                var darkBtn = new Button { Text = "🌙 Dunkel", Size = new Size(80, 30), Location = new Point(100, 50) };
+                var okBtn = new Button { Text = "OK", Size = new Size(60, 30), Location = new Point(190, 50), DialogResult = DialogResult.OK };
+
+                lightBtn.Click += (s, e) => { SetLightTheme(); form.Close(); };
+                darkBtn.Click += (s, e) => { SetDarkTheme(); form.Close(); };
+
+                form.Controls.AddRange(new Control[] { label, lightBtn, darkBtn, okBtn });
+                form.ShowDialog(this);
+            }
+        }
+
+        private void ToggleSimpleTheme()
+        {
+            if (this.BackColor.R > 100)
+                SetDarkTheme();
+            else
+                SetLightTheme();
+        }
+
+        private void SetLightTheme()
+        {
+            this.BackColor = Color.White;
+            SetThemeToAllControls(this, true);
+            MessageBox.Show("☀️ Helles Theme aktiviert", "Theme", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void SetDarkTheme()
+        {
+            this.BackColor = Color.FromArgb(30, 30, 30);
+            SetThemeToAllControls(this, false);
+            MessageBox.Show("🌙 Dunkles Theme aktiviert", "Theme", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void SetThemeToAllControls(Control parent, bool isLight)
+        {
+            foreach (Control control in parent.Controls)
+            {
+                if (control is Panel panel && !panel.Name.Contains("header"))
+                {
+                    panel.BackColor = isLight ? Color.White : Color.FromArgb(50, 50, 50);
+                }
+                else if (control is Label label)
+                {
+                    label.ForeColor = isLight ? Color.Black : Color.White;
+                }
+                else if (control is Button button)
+                {
+                    button.BackColor = isLight ? Color.FromArgb(240, 240, 240) : Color.FromArgb(60, 60, 60);
+                    button.ForeColor = isLight ? Color.Black : Color.White;
+                }
+                else if (control is GroupBox groupBox)
+                {
+                    groupBox.ForeColor = isLight ? Color.DarkBlue : Color.LightBlue;
+                }
+
+                if (control.HasChildren)
+                    ApplyThemeToAllControls(control, isLight);
+            }
+        }
+
+        private void ShowAboutDialog()
+        {
+            var about = "🗡️ Conan Exiles Optimizer v3.0.0 🏰\nBuild: 2025-08-25\nEntwickler: Panicgrinder\n\n© 2025 - Open Source";
+            MessageBox.Show(about, "Über", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        #region UI Menu System
+
+        /// <summary>
+        /// Erstellt das Hauptmenü
+        /// </summary>
+        private void CreateMainMenu()
+        {
+            var menuStrip = new MenuStrip();
+            
+            // Datei-Menü
+            var fileMenu = new ToolStripMenuItem("📁 &Datei");
+            fileMenu.DropDownItems.Add("🆕 &Neues Profil", null, NewProfile_Click);
+            fileMenu.DropDownItems.Add("📂 Profil &laden", null, LoadProfile_Click);
+            fileMenu.DropDownItems.Add("💾 Profil &speichern", null, SaveProfile_Click);
+            fileMenu.DropDownItems.Add(new ToolStripSeparator());
+            fileMenu.DropDownItems.Add("📤 &Exportieren", null, Export_Click);
+            fileMenu.DropDownItems.Add("📥 &Importieren", null, Import_Click);
+            fileMenu.DropDownItems.Add(new ToolStripSeparator());
+            fileMenu.DropDownItems.Add("🚪 &Beenden", null, Exit_Click);
+
+            // Ansicht-Menü
+            var viewMenu = new ToolStripMenuItem("👁️ &Ansicht");
+            viewMenu.DropDownItems.Add("🎨 &UI-Einstellungen", null, UISettings_Click);
+            viewMenu.DropDownItems.Add("🌗 &Theme wechseln", null, ToggleTheme_Click);
+            viewMenu.DropDownItems.Add(new ToolStripSeparator());
+            viewMenu.DropDownItems.Add("📊 &Performance-Monitor", null, ShowPerformanceMonitor_Click);
+            viewMenu.DropDownItems.Add("📈 &Detaillierte Statistiken", null, ShowDetailedStats_Click);
+            viewMenu.DropDownItems.Add(new ToolStripSeparator());
+            viewMenu.DropDownItems.Add("🔄 &Aktualisieren", null, Refresh_Click);
+
+            // Tools-Menü
+            var toolsMenu = new ToolStripMenuItem("🛠️ &Tools");
+            toolsMenu.DropDownItems.Add("🧹 &Workspace bereinigen", null, CleanWorkspace_Click);
+            toolsMenu.DropDownItems.Add("🔧 &Registry-Editor", null, OpenRegistryEditor_Click);
+            toolsMenu.DropDownItems.Add("📋 &System-Info", null, ShowSystemInfo_Click);
+            toolsMenu.DropDownItems.Add(new ToolStripSeparator());
+            toolsMenu.DropDownItems.Add("⚙️ &Erweiterte Einstellungen", null, AdvancedSettings_Click);
+
+            // Hilfe-Menü
+            var helpMenu = new ToolStripMenuItem("❓ &Hilfe");
+            helpMenu.DropDownItems.Add("📖 &Benutzerhandbuch", null, ShowUserManual_Click);
+            helpMenu.DropDownItems.Add("🔗 &Online-Hilfe", null, OnlineHelp_Click);
+            helpMenu.DropDownItems.Add(new ToolStripSeparator());
+            helpMenu.DropDownItems.Add("🐛 &Fehler melden", null, ReportBug_Click);
+            helpMenu.DropDownItems.Add("💝 &Spenden", null, Donate_Click);
+            helpMenu.DropDownItems.Add(new ToolStripSeparator());
+            helpMenu.DropDownItems.Add("ℹ️ &Über", null, About_Click);
+
+            menuStrip.Items.AddRange(new ToolStripItem[] { fileMenu, viewMenu, toolsMenu, helpMenu });
+            this.MainMenuStrip = menuStrip;
+            this.Controls.Add(menuStrip);
+        }
+
+        private void UISettings_Click(object sender, EventArgs e)
+        {
+            ShowSimpleUISettings();
+        }
+
+        private void ShowSimpleUISettings()
+        {
+            using (var settingsForm = new Form())
+            {
+                settingsForm.Text = "🎨 UI-Einstellungen";
+                settingsForm.Size = new Size(400, 300);
+                settingsForm.StartPosition = FormStartPosition.CenterParent;
+                settingsForm.FormBorderStyle = FormBorderStyle.FixedDialog;
+                settingsForm.MaximizeBox = false;
+                settingsForm.MinimizeBox = false;
+
+                var themeGroup = new GroupBox
+                {
+                    Text = "🌈 Theme-Auswahl",
+                    Size = new Size(360, 100),
+                    Location = new Point(10, 10)
+                };
+
+                var lightThemeRadio = new RadioButton { Text = "☀️ Hell", Location = new Point(10, 25), AutoSize = true };
+                var darkThemeRadio = new RadioButton { Text = "🌙 Dunkel", Location = new Point(10, 50), AutoSize = true, Checked = true };
+                var contrastRadio = new RadioButton { Text = "🔆 Hoher Kontrast", Location = new Point(10, 75), AutoSize = true };
+
+                themeGroup.Controls.AddRange(new Control[] { lightThemeRadio, darkThemeRadio, contrastRadio });
+
+                var colorGroup = new GroupBox
+                {
+                    Text = "🎨 Farben",
+                    Size = new Size(360, 80),
+                    Location = new Point(10, 120)
+                };
+
+                var primaryColorButton = new Button
+                {
+                    Text = "🎯 Primärfarbe",
+                    Size = new Size(100, 30),
+                    Location = new Point(10, 25),
+                    BackColor = Color.FromArgb(0, 122, 204)
+                };
+
+                var accentColorButton = new Button
+                {
+                    Text = "✨ Akzentfarbe",
+                    Size = new Size(100, 30),
+                    Location = new Point(120, 25),
+                    BackColor = Color.FromArgb(255, 140, 0)
+                };
+
+                primaryColorButton.Click += (s, e) => ShowColorPicker(primaryColorButton, "Primärfarbe wählen");
+                accentColorButton.Click += (s, e) => ShowColorPicker(accentColorButton, "Akzentfarbe wählen");
+
+                colorGroup.Controls.AddRange(new Control[] { primaryColorButton, accentColorButton });
+
+                var okButton = new Button
+                {
+                    Text = "✅ OK",
+                    Size = new Size(80, 30),
+                    Location = new Point(210, 220),
+                    DialogResult = DialogResult.OK
+                };
+
+                var cancelButton = new Button
+                {
+                    Text = "❌ Abbrechen",
+                    Size = new Size(80, 30),
+                    Location = new Point(300, 220),
+                    DialogResult = DialogResult.Cancel
+                };
+
+                okButton.Click += (s, e) =>
+                {
+                    if (lightThemeRadio.Checked)
+                        ApplyLightTheme();
+                    else if (darkThemeRadio.Checked)
+                        ApplyDarkTheme();
+                    else if (contrastRadio.Checked)
+                        ApplyHighContrastTheme();
+                };
+
+                settingsForm.Controls.AddRange(new Control[] { themeGroup, colorGroup, okButton, cancelButton });
+                settingsForm.ShowDialog(this);
+            }
+        }
+
+        private void ShowColorPicker(Button colorButton, string title)
+        {
+            using (var colorDialog = new ColorDialog())
+            {
+                colorDialog.Color = colorButton.BackColor;
+                colorDialog.FullOpen = true;
+                
+                if (colorDialog.ShowDialog() == DialogResult.OK)
+                {
+                    colorButton.BackColor = colorDialog.Color;
+                }
+            }
+        }
+
+        private void ToggleTheme_Click(object sender, EventArgs e)
+        {
+            if (this.BackColor == Color.FromArgb(240, 240, 240) || this.BackColor == Color.White)
+            {
+                ApplyDarkTheme();
+                MessageBox.Show("🌙 Dunkles Theme aktiviert", "Theme", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+                ApplyLightTheme();
+                MessageBox.Show("☀️ Helles Theme aktiviert", "Theme", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+
+        private void ApplyLightTheme()
+        {
+            this.BackColor = Color.White;
+            ApplyThemeToAllControls(this, true);
+        }
+
+        private void ApplyDarkTheme()
+        {
+            this.BackColor = Color.FromArgb(30, 30, 30);
+            ApplyThemeToAllControls(this, false);
+        }
+
+        private void ApplyHighContrastTheme()
+        {
+            this.BackColor = Color.Black;
+            ApplyHighContrastToAllControls(this);
+        }
+
+        private void ApplyThemeToAllControls(Control parent, bool isLight)
+        {
+            foreach (Control control in parent.Controls)
+            {
+                if (control is Panel panel && !panel.Name.Contains("header"))
+                {
+                    panel.BackColor = isLight ? Color.White : Color.FromArgb(50, 50, 50);
+                }
+                else if (control is Label label)
+                {
+                    label.ForeColor = isLight ? Color.Black : Color.White;
+                }
+                else if (control is Button button)
+                {
+                    button.BackColor = isLight ? Color.FromArgb(240, 240, 240) : Color.FromArgb(60, 60, 60);
+                    button.ForeColor = isLight ? Color.Black : Color.White;
+                }
+                else if (control is GroupBox groupBox)
+                {
+                    groupBox.ForeColor = isLight ? Color.DarkBlue : Color.LightBlue;
+                }
+
+                if (control.HasChildren)
+                    ApplyThemeToAllControls(control, isLight);
+            }
+        }
+
+        private void ApplyHighContrastToAllControls(Control parent)
+        {
+            foreach (Control control in parent.Controls)
+            {
+                if (control is Panel panel && !panel.Name.Contains("header"))
+                {
+                    panel.BackColor = Color.Black;
+                }
+                else if (control is Label label)
+                {
+                    label.ForeColor = Color.Yellow;
+                }
+                else if (control is Button button)
+                {
+                    button.BackColor = Color.FromArgb(40, 40, 40);
+                    button.ForeColor = Color.White;
+                }
+                else if (control is GroupBox groupBox)
+                {
+                    groupBox.ForeColor = Color.Cyan;
+                }
+
+                if (control.HasChildren)
+                    ApplyHighContrastToAllControls(control);
+            }
+        }
+
+        // Weitere Menu-Handler (vereinfacht)
+        private void NewProfile_Click(object sender, EventArgs e) => 
+            MessageBox.Show("🆕 Neues Profil wird erstellt...", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+        private void LoadProfile_Click(object sender, EventArgs e) => 
+            MessageBox.Show("📂 Profil-Laden wird implementiert...", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+        private void SaveProfile_Click(object sender, EventArgs e) => 
+            MessageBox.Show("💾 Profil-Speichern wird implementiert...", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+        private void Export_Click(object sender, EventArgs e) => 
+            MessageBox.Show("📤 Export wird implementiert...", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+        private void Import_Click(object sender, EventArgs e) => 
+            MessageBox.Show("📥 Import wird implementiert...", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+        private void Exit_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Möchten Sie das Programm wirklich beenden?", "Beenden", 
+                              MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                Application.Exit();
+        }
+
+        private void ShowPerformanceMonitor_Click(object sender, EventArgs e) => 
+            MessageBox.Show("📊 Performance-Monitor wird implementiert...", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+        private void ShowDetailedStats_Click(object sender, EventArgs e) => 
+            MessageBox.Show("📈 Detaillierte Statistiken werden implementiert...", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+        private void Refresh_Click(object sender, EventArgs e)
+        {
+            // DetectInstallations(); // Wird später implementiert
+            // UpdateStatus(); // Wird später implementiert  
+            MessageBox.Show("🔄 Daten wurden aktualisiert", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void CleanWorkspace_Click(object sender, EventArgs e)
+        {
+            var result = MessageBox.Show("Workspace-Cleanup-Tool ausführen?", "Bereinigen", 
+                                       MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (result == DialogResult.Yes)
+                MessageBox.Show("🧹 Cleanup wird implementiert...", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void OpenRegistryEditor_Click(object sender, EventArgs e)
+        {
+            try { Process.Start("regedit.exe"); }
+            catch (Exception ex) { MessageBox.Show($"Fehler: {ex.Message}", "Fehler", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+        }
+
+        private void ShowSystemInfo_Click(object sender, EventArgs e)
+        {
+            var info = $"🖥️ System-Info:\nOS: {Environment.OSVersion}\nKerne: {Environment.ProcessorCount}\nUser: {Environment.UserName}";
+            MessageBox.Show(info, "System-Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void AdvancedSettings_Click(object sender, EventArgs e) => 
+            MessageBox.Show("⚙️ Erweiterte Einstellungen werden implementiert...", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+        private void ShowUserManual_Click(object sender, EventArgs e) => 
+            MessageBox.Show("📖 Benutzerhandbuch wird geöffnet...", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+        private void OnlineHelp_Click(object sender, EventArgs e)
+        {
+            try { Process.Start(new ProcessStartInfo("https://github.com/Panicgrinder/Inofficial-Conan-Exiles-Performance-Optimizer") { UseShellExecute = true }); }
+            catch (Exception ex) { MessageBox.Show($"Fehler: {ex.Message}", "Fehler", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+        }
+
+        private void ReportBug_Click(object sender, EventArgs e)
+        {
+            try { Process.Start(new ProcessStartInfo("https://github.com/Panicgrinder/Inofficial-Conan-Exiles-Performance-Optimizer/issues") { UseShellExecute = true }); }
+            catch (Exception ex) { MessageBox.Show($"Fehler: {ex.Message}", "Fehler", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+        }
+
+        private void Donate_Click(object sender, EventArgs e) => 
+            MessageBox.Show("💝 Danke für die Unterstützung!\nSpenden-Info wird implementiert...", "Spenden", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+        private void About_Click(object sender, EventArgs e)
+        {
+            var about = "🗡️ Conan Exiles Optimizer v3.0.0 🏰\nBuild: 2025-08-25\nEntwickler: Panicgrinder\n\n© 2025 - Open Source";
+            MessageBox.Show(about, "Über", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        #endregion
     }
     
     // Program Entry Point

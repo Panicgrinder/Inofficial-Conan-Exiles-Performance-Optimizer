@@ -24,4 +24,11 @@
     <PackageReference Include="System.Management" Version="6.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Include="..\modules\ui\*.cs" />
+    <Compile Include="..\modules\core\*.cs" />
+    <Compile Include="..\modules\optimizations\*.cs" />
+    <Compile Remove="ConanOptimizerSafe.cs" />
+  </ItemGroup>
+
 </Project>
