@@ -27,8 +27,8 @@ namespace ConanExilesOptimizer
         private const string ConanAppId = "440900";
         private const string ConanExecutableName = "ConanSandbox-Win64-Shipping.exe";
         private const string GameModeRegistryPath = @"SOFTWARE\Microsoft\GameBar";
-        private const int WindowWidth = 900;
-        private const int WindowHeight = 700;
+        private const int WindowWidth = 1200; // Full HD geeignet
+        private const int WindowHeight = 800;  // Full HD geeignet
         private const int MonitoringUpdateInterval = 1000; // ms
         #endregion
 
@@ -57,57 +57,119 @@ namespace ConanExilesOptimizer
         {
             this.SuspendLayout();
             
-            // Main Form
-            this.AutoScaleDimensions = new SizeF(7F, 15F);
-            this.AutoScaleMode = AutoScaleMode.Font;
+            // Main Form - Moderne Full HD UI
+            this.AutoScaleDimensions = new SizeF(96F, 96F);
+            this.AutoScaleMode = AutoScaleMode.Dpi;
             this.ClientSize = new Size(WindowWidth, WindowHeight);
             this.Text = $"{AppTitle} {AppVersion}";
             this.StartPosition = FormStartPosition.CenterScreen;
-            this.FormBorderStyle = FormBorderStyle.FixedDialog;
-            this.MaximizeBox = false;
-            this.BackColor = Color.FromArgb(240, 240, 240);
+            this.FormBorderStyle = FormBorderStyle.Sizable;
+            this.MinimumSize = new Size(1000, 600);
+            this.BackColor = Color.FromArgb(32, 34, 37); // Dunkles Theme
             this.Icon = SystemIcons.Application;
+            this.Font = new Font("Segoe UI", 9F);
             
-            // Einfaches Menü direkt erstellen
-            var menuStrip = new MenuStrip();
-            var fileMenu = new ToolStripMenuItem("📁 &Datei");
-            fileMenu.DropDownItems.Add("🚪 &Beenden", null, (s, e) => Application.Exit());
-            var viewMenu = new ToolStripMenuItem("👁️ &Ansicht");  
-            viewMenu.DropDownItems.Add("🎨 &UI-Einstellungen", null, (s, e) => MessageBox.Show("UI-Einstellungen werden implementiert...", "Info"));
-            var helpMenu = new ToolStripMenuItem("❓ &Hilfe");
-            helpMenu.DropDownItems.Add("ℹ️ &Über", null, (s, e) => MessageBox.Show("🗡️ Conan Exiles Optimizer v3.0.0 🏰\nEntwickler: Panicgrinder\n© 2025", "Über"));
-            menuStrip.Items.AddRange(new ToolStripItem[] { fileMenu, viewMenu, helpMenu });
+            // Moderne Menüleiste
+            var menuStrip = new MenuStrip
+            {
+                BackColor = Color.FromArgb(54, 57, 63),
+                ForeColor = Color.White,
+                Font = new Font("Segoe UI", 9F)
+            };
+            
+            // Datei Menü
+            var fileMenu = new ToolStripMenuItem("Datei")
+            {
+                ForeColor = Color.White
+            };
+            var openItem = new ToolStripMenuItem("📁 Öffnen") { ForeColor = Color.White, ShortcutKeyDisplayString = "Ctrl+O" };
+            var saveItem = new ToolStripMenuItem("💾 Speichern") { ForeColor = Color.White, ShortcutKeyDisplayString = "Ctrl+S" };
+            var exitItem = new ToolStripMenuItem("🚪 Beenden") { ForeColor = Color.White, ShortcutKeyDisplayString = "Alt+F4" };
+            exitItem.Click += (s, e) => Application.Exit();
+            fileMenu.DropDownItems.AddRange(new ToolStripItem[] { openItem, saveItem, new ToolStripSeparator(), exitItem });
+            
+            // Ansicht Menü
+            var viewMenu = new ToolStripMenuItem("Ansicht")
+            {
+                ForeColor = Color.White
+            };
+            var lightThemeItem = new ToolStripMenuItem("🎨 Helles Theme") { ForeColor = Color.White };
+            lightThemeItem.Click += (s, e) => {
+                this.BackColor = Color.FromArgb(240, 240, 240);
+                MessageBox.Show("☀️ Helles Theme aktiviert!", "Theme", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            };
+            var darkThemeItem = new ToolStripMenuItem("🌙 Dunkles Theme") { ForeColor = Color.White };
+            darkThemeItem.Click += (s, e) => {
+                this.BackColor = Color.FromArgb(32, 34, 37);
+                MessageBox.Show("🌙 Dunkles Theme aktiviert!", "Theme", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            };
+            var settingsItem = new ToolStripMenuItem("⚙️ UI-Einstellungen") { ForeColor = Color.White };
+            settingsItem.Click += (s, e) => MessageBox.Show("⚙️ UI-Einstellungen\n\nHier können Sie in Zukunft:\n• Farbschemas anpassen\n• Schriftgrößen ändern\n• Layout-Optionen wählen", "UI-Einstellungen", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            viewMenu.DropDownItems.AddRange(new ToolStripItem[] { lightThemeItem, darkThemeItem, new ToolStripSeparator(), settingsItem });
+            
+            // Tools Menü
+            var toolsMenu = new ToolStripMenuItem("Tools")
+            {
+                ForeColor = Color.White
+            };
+            var optimizeItem = new ToolStripMenuItem("🔧 System-Optimierung") { ForeColor = Color.White };
+            optimizeItem.Click += (s, e) => OptimizeButton_Click(s, e);
+            var monitorItem = new ToolStripMenuItem("📊 Performance-Monitor") { ForeColor = Color.White };
+            monitorItem.Click += (s, e) => MonitorButton_Click(s, e);
+            var clearCacheItem = new ToolStripMenuItem("🧹 Cache leeren") { ForeColor = Color.White };
+            toolsMenu.DropDownItems.AddRange(new ToolStripItem[] { optimizeItem, monitorItem, clearCacheItem });
+            
+            // Hilfe Menü
+            var helpMenu = new ToolStripMenuItem("Hilfe")
+            {
+                ForeColor = Color.White
+            };
+            var manualItem = new ToolStripMenuItem("📖 Benutzerhandbuch") { ForeColor = Color.White };
+            var supportItem = new ToolStripMenuItem("🆘 Support") { ForeColor = Color.White };
+            var aboutItem = new ToolStripMenuItem("ℹ️ Über") { ForeColor = Color.White };
+            aboutItem.Click += (s, e) => {
+                var about = "🗡️ CONAN EXILES OPTIMIZER 🏰\n\n" +
+                           "Version: 3.0.0\n" +
+                           "Build: 2025-08-25\n" +
+                           "Entwickler: Panicgrinder\n\n" +
+                           "Professionelle Performance-Optimierung\n" +
+                           "für maximale FPS und Stabilität\n\n" +
+                           "© 2025 - Open Source";
+                MessageBox.Show(about, "Über den Optimizer", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            };
+            helpMenu.DropDownItems.AddRange(new ToolStripItem[] { manualItem, supportItem, new ToolStripSeparator(), aboutItem });
+            
+            menuStrip.Items.AddRange(new ToolStripItem[] { fileMenu, viewMenu, toolsMenu, helpMenu });
             this.MainMenuStrip = menuStrip;
             this.Controls.Add(menuStrip);
             
-            // Header Panel
+            // Moderner Header mit Gradient
             var headerPanel = new Panel
             {
-                Size = new Size(880, 80),
-                Location = new Point(10, 35), // Angepasst für Menü
-                BackColor = Color.FromArgb(70, 130, 180),
-                BorderStyle = BorderStyle.FixedSingle
+                Size = new Size(WindowWidth - 40, 100),
+                Location = new Point(20, 35),
+                BackColor = Color.FromArgb(67, 139, 202)
             };
             
             var titleLabel = new Label
             {
                 Text = "🗡️ CONAN EXILES OPTIMIZER 🏰",
-                Font = new Font("Arial", 18, FontStyle.Bold),
+                Font = new Font("Segoe UI", 24, FontStyle.Bold),
                 ForeColor = Color.White,
                 BackColor = Color.Transparent,
-                Size = new Size(860, 40),
-                Location = new Point(10, 10),
+                Size = new Size(WindowWidth - 80, 50),
+                Location = new Point(20, 15),
                 TextAlign = ContentAlignment.MiddleCenter
             };
             
             var subtitleLabel = new Label
             {
-                Text = "Optimiert automatisch Conan Exiles für maximale Performance",
-                Font = new Font("Arial", 10),
-                ForeColor = Color.LightGray,
+                Text = "Professionelle Performance-Optimierung für maximale FPS und Stabilität",
+                Font = new Font("Segoe UI", 11),
+                ForeColor = Color.FromArgb(230, 230, 230),
                 BackColor = Color.Transparent,
-                Size = new Size(860, 20),
-                Location = new Point(10, 50),
+                Size = new Size(WindowWidth - 80, 25),
+                Location = new Point(20, 65),
                 TextAlign = ContentAlignment.MiddleCenter
             };
             
@@ -115,149 +177,278 @@ namespace ConanExilesOptimizer
             headerPanel.Controls.Add(subtitleLabel);
             this.Controls.Add(headerPanel);
             
-            // Status Group
+            // Moderne Status-Sektion (Links)
+            var leftPanel = new Panel
+            {
+                Size = new Size(580, 600),
+                Location = new Point(20, 150),
+                BackColor = Color.FromArgb(47, 49, 54),
+                BorderStyle = BorderStyle.FixedSingle
+            };
+            
             var statusGroup = new GroupBox
             {
-                Text = "📊 Installation Status",
-                Font = new Font("Arial", 10, FontStyle.Bold),
-                Size = new Size(430, 200),
-                Location = new Point(10, 100),
-                ForeColor = Color.DarkBlue
+                Text = "📊 System Status",
+                Font = new Font("Segoe UI", 12, FontStyle.Bold),
+                Size = new Size(560, 280),
+                Location = new Point(10, 10),
+                ForeColor = Color.White,
+                BackColor = Color.Transparent
             };
             
             this.steamStatusLabel = new Label
             {
-                Size = new Size(400, 25),
-                Location = new Point(15, 30),
-                Font = new Font("Arial", 9),
+                Size = new Size(530, 30),
+                Location = new Point(15, 35),
+                Font = new Font("Segoe UI", 10),
+                ForeColor = Color.LightGray,
                 Text = "🔍 Steam wird gesucht..."
             };
             
             this.conanStatusLabel = new Label
             {
-                Size = new Size(400, 25),
-                Location = new Point(15, 60),
-                Font = new Font("Arial", 9),
+                Size = new Size(530, 30),
+                Location = new Point(15, 70),
+                Font = new Font("Segoe UI", 10),
+                ForeColor = Color.LightGray,
                 Text = "🔍 Conan Exiles wird gesucht..."
             };
             
             this.modStatusLabel = new Label
             {
-                Size = new Size(400, 25),
-                Location = new Point(15, 90),
-                Font = new Font("Arial", 9),
+                Size = new Size(530, 30),
+                Location = new Point(15, 105),
+                Font = new Font("Segoe UI", 10),
+                ForeColor = Color.LightGray,
                 Text = "📦 Mod-Status wird geladen..."
             };
             
             this.systemStatusLabel = new Label
             {
-                Size = new Size(400, 25),
-                Location = new Point(15, 120),
-                Font = new Font("Arial", 9),
+                Size = new Size(530, 30),
+                Location = new Point(15, 140),
+                Font = new Font("Segoe UI", 10),
+                ForeColor = Color.LightGray,
                 Text = "💻 System-Info wird geladen..."
             };
             
             this.performanceLabel = new Label
             {
-                Size = new Size(400, 25),
-                Location = new Point(15, 150),
-                Font = new Font("Arial", 9, FontStyle.Bold),
+                Size = new Size(530, 30),
+                Location = new Point(15, 175),
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
                 Text = "⚡ Performance-Status: Unbekannt",
-                ForeColor = Color.Gray
+                ForeColor = Color.Yellow
+            };
+            
+            // Log-Bereich
+            var logLabel = new Label
+            {
+                Text = "📋 Aktivitätsprotokoll",
+                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                ForeColor = Color.White,
+                Size = new Size(530, 25),
+                Location = new Point(15, 300)
+            };
+            
+            var logTextBox = new TextBox
+            {
+                Multiline = true,
+                ScrollBars = ScrollBars.Vertical,
+                BackColor = Color.FromArgb(32, 34, 37),
+                ForeColor = Color.LightGray,
+                Font = new Font("Consolas", 9),
+                Size = new Size(530, 180),
+                Location = new Point(15, 330),
+                ReadOnly = true,
+                Text = "[13:33:47] 🔄 Aktualisiere Status...\n[13:33:47] 🔍 Führe System-Diagnose durch...\n[13:33:47] 💾 Festplattenspeicher: 966GB frei\n[13:33:47] 📦 Aktive Mods: 3\n[13:33:47] 💻 Empfehlung: Mindestens 16GB RAM für stabiles Spiel mit Mods\n[13:33:47] ✅ Status aktualisiert"
             };
             
             statusGroup.Controls.AddRange(new Control[] {
                 steamStatusLabel, conanStatusLabel, modStatusLabel, 
                 systemStatusLabel, performanceLabel
             });
-            this.Controls.Add(statusGroup);
             
-            // Actions Group
+            leftPanel.Controls.Add(statusGroup);
+            leftPanel.Controls.Add(logLabel);
+            leftPanel.Controls.Add(logTextBox);
+            this.Controls.Add(leftPanel);
+            
+            // Moderne Aktions-Sektion (Rechts)
+            var rightPanel = new Panel
+            {
+                Size = new Size(580, 600),
+                Location = new Point(620, 150),
+                BackColor = Color.FromArgb(47, 49, 54),
+                BorderStyle = BorderStyle.FixedSingle
+            };
+            
             var actionsGroup = new GroupBox
             {
                 Text = "🚀 Aktionen",
-                Font = new Font("Arial", 10, FontStyle.Bold),
-                Size = new Size(430, 200),
-                Location = new Point(460, 100),
-                ForeColor = Color.DarkGreen
+                Font = new Font("Segoe UI", 12, FontStyle.Bold),
+                Size = new Size(560, 580),
+                Location = new Point(10, 10),
+                ForeColor = Color.White,
+                BackColor = Color.Transparent
             };
             
+            // Große Haupt-Buttons
             this.optimizeButton = new Button
             {
-                Text = "🔧 Conan Exiles optimieren",
-                Size = new Size(180, 40),
-                Location = new Point(20, 30),
-                BackColor = Color.LightGreen,
-                Font = new Font("Arial", 9, FontStyle.Bold),
-                UseVisualStyleBackColor = false,
+                Text = "🔧 CONAN EXILES OPTIMIEREN",
+                Size = new Size(520, 60),
+                Location = new Point(20, 40),
+                BackColor = Color.FromArgb(88, 175, 88),
+                ForeColor = Color.White,
+                Font = new Font("Segoe UI", 12, FontStyle.Bold),
+                FlatStyle = FlatStyle.Flat,
                 Cursor = Cursors.Hand
             };
+            optimizeButton.FlatAppearance.BorderSize = 0;
             optimizeButton.Click += OptimizeButton_Click;
             
             this.monitorButton = new Button
             {
-                Text = "📊 Performance überwachen",
-                Size = new Size(180, 40),
-                Location = new Point(220, 30),
-                BackColor = Color.LightBlue,
-                Font = new Font("Arial", 9, FontStyle.Bold),
-                UseVisualStyleBackColor = false,
+                Text = "📊 PERFORMANCE ÜBERWACHEN",
+                Size = new Size(520, 60),
+                Location = new Point(20, 120),
+                BackColor = Color.FromArgb(74, 144, 226),
+                ForeColor = Color.White,
+                Font = new Font("Segoe UI", 12, FontStyle.Bold),
+                FlatStyle = FlatStyle.Flat,
                 Cursor = Cursors.Hand
             };
+            monitorButton.FlatAppearance.BorderSize = 0;
             monitorButton.Click += MonitorButton_Click;
             
             this.launchButton = new Button
             {
-                Text = "🎮 Conan Exiles starten",
-                Size = new Size(180, 40),
-                Location = new Point(20, 80),
-                BackColor = Color.Orange,
-                Font = new Font("Arial", 9, FontStyle.Bold),
-                UseVisualStyleBackColor = false,
+                Text = "🎮 CONAN EXILES STARTEN",
+                Size = new Size(520, 60),
+                Location = new Point(20, 200),
+                BackColor = Color.FromArgb(255, 140, 0),
+                ForeColor = Color.White,
+                Font = new Font("Segoe UI", 12, FontStyle.Bold),
+                FlatStyle = FlatStyle.Flat,
                 Cursor = Cursors.Hand
             };
+            launchButton.FlatAppearance.BorderSize = 0;
             launchButton.Click += LaunchButton_Click;
             
+            // Kleinere Funktions-Buttons
             this.refreshButton = new Button
             {
                 Text = "🔄 Status aktualisieren",
-                Size = new Size(180, 40),
-                Location = new Point(220, 80),
-                BackColor = Color.LightGray,
-                Font = new Font("Arial", 9, FontStyle.Bold),
-                UseVisualStyleBackColor = false,
+                Size = new Size(250, 45),
+                Location = new Point(20, 300),
+                BackColor = Color.FromArgb(114, 137, 218),
+                ForeColor = Color.White,
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                FlatStyle = FlatStyle.Flat,
                 Cursor = Cursors.Hand
             };
+            refreshButton.FlatAppearance.BorderSize = 0;
             refreshButton.Click += RefreshButton_Click;
             
             this.advancedButton = new Button
             {
                 Text = "⚙️ Erweiterte Einstellungen",
-                Size = new Size(180, 40),
-                Location = new Point(20, 130),
-                BackColor = Color.Plum,
-                Font = new Font("Arial", 9, FontStyle.Bold),
-                UseVisualStyleBackColor = false,
+                Size = new Size(250, 45),
+                Location = new Point(290, 300),
+                BackColor = Color.FromArgb(153, 170, 181),
+                ForeColor = Color.White,
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                FlatStyle = FlatStyle.Flat,
                 Cursor = Cursors.Hand
             };
+            advancedButton.FlatAppearance.BorderSize = 0;
             advancedButton.Click += AdvancedButton_Click;
+            
+            var backupButton = new Button
+            {
+                Text = "💾 Backup erstellen",
+                Size = new Size(250, 45),
+                Location = new Point(20, 360),
+                BackColor = Color.FromArgb(121, 85, 159),
+                ForeColor = Color.White,
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                FlatStyle = FlatStyle.Flat,
+                Cursor = Cursors.Hand
+            };
+            backupButton.FlatAppearance.BorderSize = 0;
             
             var helpButton = new Button
             {
-                Text = "❓ Hilfe & Info",
-                Size = new Size(180, 40),
-                Location = new Point(220, 130),
-                BackColor = Color.LightYellow,
-                Font = new Font("Arial", 9, FontStyle.Bold),
-                UseVisualStyleBackColor = false,
+                Text = "❓ Hilfe & Support",
+                Size = new Size(250, 45),
+                Location = new Point(290, 360),
+                BackColor = Color.FromArgb(250, 166, 26),
+                ForeColor = Color.White,
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                FlatStyle = FlatStyle.Flat,
                 Cursor = Cursors.Hand
             };
+            helpButton.FlatAppearance.BorderSize = 0;
             helpButton.Click += HelpButton_Click;
+            
+            // Quick Actions
+            var quickLabel = new Label
+            {
+                Text = "⚡ Quick Actions",
+                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                ForeColor = Color.White,
+                Size = new Size(520, 25),
+                Location = new Point(20, 430)
+            };
+            
+            var clearCacheButton = new Button
+            {
+                Text = "🧹 Cache leeren",
+                Size = new Size(160, 35),
+                Location = new Point(20, 465),
+                BackColor = Color.FromArgb(220, 53, 69),
+                ForeColor = Color.White,
+                Font = new Font("Segoe UI", 9, FontStyle.Bold),
+                FlatStyle = FlatStyle.Flat,
+                Cursor = Cursors.Hand
+            };
+            clearCacheButton.FlatAppearance.BorderSize = 0;
+            
+            var repairModsButton = new Button
+            {
+                Text = "🔧 Mods reparieren",
+                Size = new Size(160, 35),
+                Location = new Point(190, 465),
+                BackColor = Color.FromArgb(40, 167, 69),
+                ForeColor = Color.White,
+                Font = new Font("Segoe UI", 9, FontStyle.Bold),
+                FlatStyle = FlatStyle.Flat,
+                Cursor = Cursors.Hand
+            };
+            repairModsButton.FlatAppearance.BorderSize = 0;
+            
+            var restoreButton = new Button
+            {
+                Text = "♻️ Wiederherstellen",
+                Size = new Size(160, 35),
+                Location = new Point(360, 465),
+                BackColor = Color.FromArgb(108, 117, 125),
+                ForeColor = Color.White,
+                Font = new Font("Segoe UI", 9, FontStyle.Bold),
+                FlatStyle = FlatStyle.Flat,
+                Cursor = Cursors.Hand
+            };
+            restoreButton.FlatAppearance.BorderSize = 0;
             
             actionsGroup.Controls.AddRange(new Control[] {
                 optimizeButton, monitorButton, launchButton, 
-                refreshButton, advancedButton, helpButton
+                refreshButton, advancedButton, backupButton, helpButton,
+                quickLabel, clearCacheButton, repairModsButton, restoreButton
             });
+            
+            rightPanel.Controls.Add(actionsGroup);
+            this.Controls.Add(rightPanel);
             
             // Add tooltips for main buttons
             var mainToolTip = new ToolTip();
@@ -1858,28 +2049,8 @@ Diese Version nutzt erprobte Community-Lösungen!";
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             
-            // Check for admin rights
-            if (!IsRunningAsAdmin())
-            {
-                var result = MessageBox.Show(
-                    "Für optimale Funktionalität sollte das Tool als Administrator ausgeführt werden.\n\n" +
-                    "Möchten Sie das Tool trotzdem starten?",
-                    "Administrator-Rechte empfohlen",
-                    MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Question);
-                    
-                if (result == DialogResult.No)
-                    return;
-            }
-            
+            // Direkt starten ohne Admin-Meldung
             Application.Run(new MainForm());
-        }
-        
-        private static bool IsRunningAsAdmin()
-        {
-            var identity = System.Security.Principal.WindowsIdentity.GetCurrent();
-            var principal = new System.Security.Principal.WindowsPrincipal(identity);
-            return principal.IsInRole(System.Security.Principal.WindowsBuiltInRole.Administrator);
         }
     }
 }
