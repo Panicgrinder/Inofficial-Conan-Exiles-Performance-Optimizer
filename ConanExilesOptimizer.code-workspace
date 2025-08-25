@@ -1,0 +1,101 @@
+{
+    "folders": [
+        {
+            "name": "🗡️ Conan Exiles Optimizer",
+            "path": "."
+        }
+    ],
+    "settings": {
+        "files.exclude": {
+            "**/bin": true,
+            "**/obj": true,
+            "**/.vs": true
+        },
+        "search.exclude": {
+            "**/bin": true,
+            "**/obj": true,
+            "**/releases": true
+        },
+        "dotnet.defaultSolution": "src/ConanOptimizer.csproj",
+        "terminal.integrated.defaultProfile.windows": "PowerShell",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.fixAll": "explicit"
+        }
+    },
+    "tasks": {
+        "version": "2.0.0",
+        "tasks": [
+            {
+                "label": "🔨 Build Release",
+                "type": "shell",
+                "command": "build-simple.bat",
+                "group": "build",
+                "presentation": {
+                    "echo": true,
+                    "reveal": "always",
+                    "focus": false,
+                    "panel": "shared"
+                },
+                "problemMatcher": "$msCompile"
+            },
+            {
+                "label": "▶️ Run Application",
+                "type": "shell",
+                "command": "dotnet",
+                "args": ["run"],
+                "options": {
+                    "cwd": "${workspaceFolder}/src"
+                },
+                "group": "test",
+                "presentation": {
+                    "echo": true,
+                    "reveal": "always",
+                    "focus": false,
+                    "panel": "shared"
+                }
+            },
+            {
+                "label": "🧪 Build Debug",
+                "type": "shell",
+                "command": "dotnet",
+                "args": ["build", "--configuration", "Debug"],
+                "options": {
+                    "cwd": "${workspaceFolder}/src"
+                },
+                "group": "build",
+                "presentation": {
+                    "echo": true,
+                    "reveal": "always",
+                    "focus": false,
+                    "panel": "shared"
+                },
+                "problemMatcher": "$msCompile"
+            }
+        ]
+    },
+    "launch": {
+        "version": "0.2.0",
+        "configurations": [
+            {
+                "name": "🗡️ Debug Conan Optimizer",
+                "type": "coreclr",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/bin/Debug/net6.0-windows/win-x64/ConanOptimizer.dll",
+                "args": [],
+                "cwd": "${workspaceFolder}/src",
+                "console": "internalConsole",
+                "stopAtEntry": false,
+                "preLaunchTask": "🧪 Build Debug"
+            }
+        ]
+    },
+    "extensions": {
+        "recommendations": [
+            "ms-dotnettools.csharp",
+            "ms-dotnettools.vscode-dotnet-runtime",
+            "formulahendry.dotnet-test-explorer",
+            "jmrog.vscode-nuget-package-manager"
+        ]
+    }
+}
