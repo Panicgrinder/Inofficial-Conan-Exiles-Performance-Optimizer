@@ -32,7 +32,6 @@ try {
 $srcDir = "src"
 $buildDir = "build"
 $outputDir = "releases\v3.0"
-$projectFile = "$srcDir\ConanOptimizer.csproj"
 
 # Erstelle Ausgabe-Verzeichnisse
 Write-Host "📂 Bereite Build-Verzeichnisse vor..." -ForegroundColor Yellow
@@ -44,11 +43,14 @@ Write-Host "📂 Bereite Build-Verzeichnisse vor..." -ForegroundColor Yellow
 # Restore Packages (falls nicht übersprungen)
 if (-not $SkipRestore) {
     Write-Host "📦 Restore NuGet Packages..." -ForegroundColor Yellow
-    & dotnet restore $projectFile
+    Push-Location $srcDir
+    & dotnet restore ConanOptimizer.csproj
     if ($LASTEXITCODE -ne 0) {
         Write-Host "❌ Package restore fehlgeschlagen!" -ForegroundColor Red
+        Pop-Location
         exit 1
     }
+    Pop-Location
 }
 
 # Build Anwendung
@@ -58,9 +60,10 @@ Write-Host "   Runtime: $Runtime" -ForegroundColor Gray
 Write-Host ""
 
 try {
-    & dotnet publish $projectFile `
+    Push-Location $srcDir
+    & dotnet publish ConanOptimizer.csproj `
         --configuration $Configuration `
-        --output $outputDir `
+        --output "..\$outputDir" `
         --self-contained true `
         --runtime $Runtime `
         /p:PublishSingleFile=true `
@@ -76,6 +79,8 @@ try {
     Write-Host "❌ Build fehlgeschlagen!" -ForegroundColor Red
     Write-Host "Fehler: $($_.Exception.Message)" -ForegroundColor Gray
     exit 1
+} finally {
+    Pop-Location
 }
 
 # Prüfe Ausgabe

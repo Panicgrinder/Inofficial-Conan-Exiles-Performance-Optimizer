@@ -18,8 +18,10 @@ namespace ConanExilesOptimizer
     public partial class MainForm : Form
     {
         #region Constants
-        private const string AppVersion = "v3.0";
+        private const string AppName = "Conan Exiles Optimizer";
+        private const string AppVersion = "v3.0.0";
         private const string AppTitle = "Conan Exiles Optimizer";
+        private const string BuildDate = "2025-08-25";
         private const string SteamRegistryPath = @"SOFTWARE\Valve\Steam";
         private const string ConanAppId = "440900";
         private const string ConanExecutableName = "ConanSandbox-Win64-Shipping.exe";
@@ -476,14 +478,14 @@ namespace ConanExilesOptimizer
                     long totalRAM = Convert.ToInt64(obj["TotalPhysicalMemory"]);
                     double ramGB = totalRAM / (1024.0 * 1024.0 * 1024.0);
                     
-                    systemStatusLabel.Text = $"💻 System: {ramGB:F1} GB RAM";
+                    systemStatusLabel.Text = $"💻 System: {ramGB:F1} GB RAM | {AppName} v{AppVersion} ({BuildDate})";
                     systemStatusLabel.ForeColor = ramGB >= 16 ? Color.Green : Color.Orange;
                     break;
                 }
             }
             catch
             {
-                systemStatusLabel.Text = "💻 System: Info nicht verfügbar";
+                systemStatusLabel.Text = $"💻 System: Info nicht verfügbar | {AppName} v{AppVersion} ({BuildDate})";
                 systemStatusLabel.ForeColor = Color.Gray;
             }
         }
