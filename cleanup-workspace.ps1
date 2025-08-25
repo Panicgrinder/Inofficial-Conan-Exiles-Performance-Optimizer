@@ -2,16 +2,14 @@
 # Analysiert zuerst, dann fragt nach Bestätigung
 
 param(
-    [switch]$Simulate
+    [switch]$Execute
 )
 
 Write-Host "🔍 CONAN EXILES OPTIMIZER - WORKSPACE ANALYSE" -ForegroundColor Cyan
 Write-Host "=============================================" -ForegroundColor Cyan
 
-# Setze Simulate auf true wenn nicht explizit anders angegeben
-if (-not $PSBoundParameters.ContainsKey('Simulate')) {
-    $Simulate = $true
-}
+# Standardverhalten: Simulation (außer -Execute ist gesetzt)
+$Simulate = -not $Execute
 
 if ($Simulate) {
     Write-Host "⚠️  SIMULATIONS-MODUS - Keine Dateien werden gelöscht!" -ForegroundColor Yellow
