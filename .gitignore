@@ -1,0 +1,59 @@
+# .gitignore für Conan Exiles Optimizer
+
+# Build-Ausgaben
+bin/
+obj/
+build/
+releases/
+*.exe
+*.dll
+*.pdb
+
+# Visual Studio / VS Code
+.vs/
+.vscode/
+*.suo
+*.user
+*.sln.docstates
+
+# .NET
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# NuGet
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Temporäre Dateien
+*.tmp
+*.temp
+*.log
+*.cache
+
+# Backup-Dateien
+*.bak
+*.backup
+
+# IDE-spezifische Dateien
+*.swp
+*.swo
+*~
+
+# Conan Exiles spezifisch
+ConanSandbox/
+Saved/
+*.profile
+
+# Test-Ausgaben
+TestResults/
+*.trx
+*.coverage
