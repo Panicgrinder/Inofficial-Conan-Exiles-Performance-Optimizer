@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    
+    <!-- Advanced Version Eigenschaften -->
+    <AssemblyTitle>Conan Exiles Optimizer - Advanced Version</AssemblyTitle>
+    <AssemblyDescription>Risiko-wählbare Performance-Optimierung</AssemblyDescription>
+    <AssemblyProduct>Conan Exiles Optimizer Advanced</AssemblyProduct>
+    <AssemblyVersion>3.2.0.0</AssemblyVersion>
+    <FileVersion>3.2.0.0</FileVersion>
+    
+    <!-- Self-contained Build -->
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <PublishSingleFile>true</PublishSingleFile>
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    
+    <!-- Startup-Objekt -->
+    <StartupObject>ConanOptimizer.Program</StartupObject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Management" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Advanced Version spezifische Datei -->
+    <Compile Include="AdvancedOptimizer.cs" />
+    
+    <!-- Gemeinsame Module -->
+    <Compile Include="..\..\modules\core\PathHelper.cs" />
+    <Compile Include="..\..\modules\core\OptimizationSettings.cs" />
+    <Compile Include="..\..\modules\optimizations\OptimizationApplier.cs" />
+  </ItemGroup>
+
+</Project>

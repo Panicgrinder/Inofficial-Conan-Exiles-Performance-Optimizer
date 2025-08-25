@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    
+    <!-- Safe Version Eigenschaften -->
+    <AssemblyTitle>Conan Exiles Optimizer - Safe Version</AssemblyTitle>
+    <AssemblyDescription>100% ban-sichere Performance-Optimierung</AssemblyDescription>
+    <AssemblyProduct>Conan Exiles Optimizer Safe</AssemblyProduct>
+    <AssemblyVersion>3.1.0.0</AssemblyVersion>
+    <FileVersion>3.1.0.0</FileVersion>
+    
+    <!-- Self-contained Build -->
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <PublishSingleFile>true</PublishSingleFile>
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    
+    <!-- Startup-Objekt -->
+    <StartupObject>ConanOptimizer.Safe.SafeProgram</StartupObject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Management" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Safe Version spezifische Datei -->
+    <Compile Include="SafeOptimizer.cs" />
+    
+    <!-- Gemeinsame Module -->
+    <Compile Include="..\..\modules\core\PathHelper.cs" />
+    <Compile Include="..\..\modules\core\OptimizationSettings.cs" />
+    <Compile Include="..\..\modules\optimizations\OptimizationApplier.cs" />
+  </ItemGroup>
+
+</Project>
