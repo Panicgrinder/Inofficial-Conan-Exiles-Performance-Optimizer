@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    
+    <!-- Sichere Version Eigenschaften -->
+    <AssemblyTitle>Conan Exiles Optimizer - Sichere Version</AssemblyTitle>
+    <AssemblyDescription>100% Ban-sichere Performance-Optimierung für Conan Exiles Online-Spiel</AssemblyDescription>
+    <AssemblyProduct>Conan Exiles Optimizer Safe</AssemblyProduct>
+    <AssemblyVersion>3.1.0.0</AssemblyVersion>
+    <FileVersion>3.1.0.0</FileVersion>
+    
+    <!-- Self-contained Build -->
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <PublishSingleFile>true</PublishSingleFile>
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    
+    <!-- Sichere Version - Startup-Objekt -->
+    <StartupObject>ConanOptimizer.Program</StartupObject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Management" Version="6.0.0" />
+    <PackageReference Include="Microsoft.VisualBasic" Version="10.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="ConanOptimizer.cs" />
+  </ItemGroup>
+
+</Project>
