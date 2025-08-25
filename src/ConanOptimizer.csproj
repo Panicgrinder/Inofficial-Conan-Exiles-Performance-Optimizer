@@ -25,9 +25,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\modules\ui\*.cs" />
-    <Compile Include="..\modules\core\*.cs" />
-    <Compile Include="..\modules\optimizations\*.cs" />
+    <!-- Temporarily exclude modules to test main UI -->
+    <!-- <Compile Include="..\modules\ui\*.cs" /> -->
+    <!-- <Compile Include="..\modules\core\*.cs" /> -->
+    <!-- <Compile Include="..\modules\optimizations\*.cs" /> -->
     <Compile Remove="ConanOptimizerSafe.cs" />
   </ItemGroup>
 
