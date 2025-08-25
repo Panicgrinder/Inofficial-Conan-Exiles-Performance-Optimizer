@@ -30,6 +30,10 @@
     <!-- <Compile Include="..\modules\core\*.cs" /> -->
     <!-- <Compile Include="..\modules\optimizations\*.cs" /> -->
     <Compile Remove="ConanOptimizerSafe.cs" />
+  <Compile Remove="Form1.cs" />
+  <Compile Remove="Form1.Designer.cs" />
+  <Compile Remove="ConanOptimizer_New.cs" />
+  <Compile Remove="ConanOptimizer.cs" />
   </ItemGroup>
 
 </Project>

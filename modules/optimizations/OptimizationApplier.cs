@@ -188,6 +188,7 @@ namespace ConanOptimizer
                 if (string.IsNullOrEmpty(gameDir)) return false;
 
                 var engineIniPath = Path.Combine(gameDir, "ConanSandbox\\Saved\\Config\\WindowsNoEditor\\Engine.ini");
+                Directory.CreateDirectory(Path.GetDirectoryName(engineIniPath));
                 
                 var lodOptimizations = new[]
                 {
@@ -212,6 +213,7 @@ namespace ConanOptimizer
                 if (string.IsNullOrEmpty(gameDir)) return false;
 
                 var engineIniPath = Path.Combine(gameDir, "ConanSandbox\\Saved\\Config\\WindowsNoEditor\\Engine.ini");
+                Directory.CreateDirectory(Path.GetDirectoryName(engineIniPath));
                 
                 var textureOptimizations = new[]
                 {
@@ -239,6 +241,7 @@ namespace ConanOptimizer
                 if (string.IsNullOrEmpty(gameDir)) return false;
 
                 var engineIniPath = Path.Combine(gameDir, "ConanSandbox\\Saved\\Config\\WindowsNoEditor\\Engine.ini");
+                Directory.CreateDirectory(Path.GetDirectoryName(engineIniPath));
                 
                 var experimentalOptimizations = new[]
                 {

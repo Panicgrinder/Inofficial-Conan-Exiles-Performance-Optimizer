@@ -13,7 +13,7 @@ $Simulate = -not $Execute
 
 if ($Simulate) {
     Write-Host "⚠️  SIMULATIONS-MODUS - Keine Dateien werden gelöscht!" -ForegroundColor Yellow
-    Write-Host "   Verwende -Simulate:`$false für echte Bereinigung" -ForegroundColor Gray
+    Write-Host "   Verwende -Execute für echte Bereinigung" -ForegroundColor Gray
 }
 
 # PHASE 1: IDENTIFIZIERE REDUNDANTE BUILD-SCRIPTS
@@ -101,7 +101,7 @@ Write-Host "   💾 Gesamt zu bereinigen: $($redundantBuilds + $redundantTests +
 if ($Simulate) {
     Write-Host ""
     Write-Host "⚠️  SIMULATION ABGESCHLOSSEN" -ForegroundColor Yellow
-    Write-Host "   Für echte Bereinigung: .\cleanup-workspace.ps1 -Simulate:`$false" -ForegroundColor White
+    Write-Host "   Für echte Bereinigung: .\cleanup-workspace.ps1 -Execute" -ForegroundColor White
 } else {
     Write-Host ""
     Write-Host "⚠️  BEREINIGUNG WÜRDE JETZT STARTEN..." -ForegroundColor Yellow
