@@ -1,7 +1,7 @@
 # VORSICHTIGE WORKSPACE-BEREINIGUNG
 # Analysiert zuerst, dann fragt nach Bestätigung
 
-param([switch]$Simulate = $true)
+param([switch]$Simulate)
 
 Write-Host "🔍 CONAN EXILES OPTIMIZER - WORKSPACE ANALYSE" -ForegroundColor Cyan
 Write-Host "=============================================" -ForegroundColor Cyan

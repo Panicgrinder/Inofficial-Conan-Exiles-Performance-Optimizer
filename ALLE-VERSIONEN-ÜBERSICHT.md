@@ -3,11 +3,11 @@
 
 ### 📊 ÜBERSICHT DER VERSIONEN
 
-| Version | Beschreibung | Ban-Risiko | Performance | Dateigröße |
-|---------|-------------|------------|-------------|------------|
-| **v3.0.0 Original** | Feste Optimierungen, bewährt | Mittel (5-10%) | +40-50% | 147.5 MB |
-| **v3.1.0 Safe** | 100% ban-sicher für Online | 0% | +15-25% | 154 MB |
-| **v3.2.0 Advanced** | Risiko-wählbar, granular | 0-30% (wählbar) | +15-75% | 154.6 MB |
+| Version | Beschreibung | Ban-Risiko | Performance | Größe |
+|---------|-------------|------------|-------------|-------|
+| **v3.0.0 Original** | Feste Optimierungen | Mittel (5-10%) | +40-50% | 147.5 MB |
+| **v3.1.0 Safe** | 100% ban-sicher | 0% | +15-25% | 154 MB |
+| **v3.2.0 Advanced** | Risiko-wählbar | 0-30% (wählbar) | +15-75% | 154.6 MB |
 
 ---
 
