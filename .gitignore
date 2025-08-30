@@ -42,6 +42,7 @@ $RECYCLE.BIN/
 # Backup-Dateien
 *.bak
 *.backup
+/.cleanup-backups/
 
 # IDE-spezifische Dateien
 *.swp

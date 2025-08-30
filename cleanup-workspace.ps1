@@ -6,6 +6,9 @@ param(
     [switch]$Force
 )
 
+# Zentrales Backup-Verzeichnis fuer Bereinigungen
+$backupDir = ".cleanup-backups"
+
 Write-Host "CONAN EXILES OPTIMIZER - WORKSPACE ANALYSE" -ForegroundColor Cyan
 Write-Host "============================================" -ForegroundColor Cyan
 
@@ -15,6 +18,29 @@ $Simulate = -not $Execute
 if ($Simulate) {
     Write-Host "SIMULATIONS-MODUS - Keine Dateien werden geloescht!" -ForegroundColor Yellow
     Write-Host "   Verwende -Execute fuer echte Bereinigung" -ForegroundColor Gray
+}
+
+# Stelle sicher, dass das Backup-Verzeichnis existiert (nur bei echter Ausfuehrung)
+if (-not $Simulate) {
+    if (-not (Test-Path -LiteralPath $backupDir)) {
+        New-Item -ItemType Directory -Path $backupDir | Out-Null
+        Write-Host ("Backup-Ordner erstellt: {0}" -f $backupDir) -ForegroundColor DarkGray
+    }
+}
+
+# Migriere vorhandene Backups im Root in den Backup-Ordner
+$existingBackups = Get-ChildItem -Path . -File -Filter 'backup_*' -ErrorAction SilentlyContinue
+if ($existingBackups -and $existingBackups.Count -gt 0) {
+    Write-Host ""; Write-Host "MIGRATION: vorhandene Backups verschieben" -ForegroundColor Yellow
+    foreach ($b in $existingBackups) {
+        $target = Join-Path $backupDir $b.Name
+        if ($Simulate) {
+            Write-Host ("   Wuerde verschieben: {0} -> {1}" -f $b.FullName, $target) -ForegroundColor Yellow
+        } else {
+            Move-Item -LiteralPath $b.FullName -Destination $target -Force
+            Write-Host ("   Verschoben: {0} -> {1}" -f $b.Name, $target) -ForegroundColor DarkYellow
+        }
+    }
 }
 
 # PHASE 1: IDENTIFIZIERE REDUNDANTE BUILD-SCRIPTS
@@ -36,8 +62,9 @@ foreach ($build in $allBuilds) {
         if (-not $Simulate) {
             # Backup erstellen vor Löschung
             $backupName = "backup_$($build.Name)"
-            Copy-Item $build.FullName $backupName
-            Write-Host ("     Backup: {0}" -f $backupName) -ForegroundColor Gray
+            $backupPath = Join-Path $backupDir $backupName
+            Copy-Item $build.FullName $backupPath
+            Write-Host ("     Backup: {0}" -f $backupPath) -ForegroundColor Gray
         }
     }
 }
@@ -48,9 +75,10 @@ if (Test-Path "build.ps1") {
     $rootBuild = Get-Item "build.ps1"
     Write-Host "   REDUNDANT: build.ps1" -ForegroundColor Red
     if (-not $Simulate) {
-        $backupName = "backup_build.ps1"
-        Copy-Item $rootBuild.FullName $backupName
-        Write-Host ("     Backup: {0}" -f $backupName) -ForegroundColor Gray
+    $backupName = "backup_build.ps1"
+    $backupPath = Join-Path $backupDir $backupName
+    Copy-Item $rootBuild.FullName $backupPath
+    Write-Host ("     Backup: {0}" -f $backupPath) -ForegroundColor Gray
     }
 }
 
@@ -66,9 +94,10 @@ foreach ($test in $allTests) {
     Write-Host ("   REDUNDANT: {0} ({1} KB) - Nur fuer Development" -f $test.Name, $sizeKB) -ForegroundColor Red
     
     if (-not $Simulate) {
-        $backupName = "backup_$($test.Name)"
-        Copy-Item $test.FullName $backupName
-    Write-Host ("     Backup: {0}" -f $backupName) -ForegroundColor Gray
+    $backupName = "backup_$($test.Name)"
+    $backupPath = Join-Path $backupDir $backupName
+    Copy-Item $test.FullName $backupPath
+    Write-Host ("     Backup: {0}" -f $backupPath) -ForegroundColor Gray
     }
 }
 
@@ -94,8 +123,9 @@ foreach ($doc in $docFiles) {
         
         if (-not $Simulate) {
             $backupName = "backup_doc_$([System.IO.Path]::GetFileNameWithoutExtension($doc.Name))_$(Get-Date -Format 'HHmm').md"
-            Copy-Item $doc.FullName $backupName
-            Write-Host ("     Backup: {0}" -f $backupName) -ForegroundColor Gray
+            $backupPath = Join-Path $backupDir $backupName
+            Copy-Item $doc.FullName $backupPath
+            Write-Host ("     Backup: {0}" -f $backupPath) -ForegroundColor Gray
         }
     }
 }

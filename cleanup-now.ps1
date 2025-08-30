@@ -1,5 +1,10 @@
 param([switch]$Execute)
 
+$backupDir = ".cleanup-backups"
+if ($Execute -and -not (Test-Path -LiteralPath $backupDir)) {
+    New-Item -ItemType Directory -Path $backupDir | Out-Null
+}
+
 # Muster für direkte Einmal-Bereinigung
 $patterns = @(
     "build.ps1",
@@ -24,16 +29,20 @@ if (-not $targets) {
 $deleted = @()
 foreach ($t in $targets) {
     if ($Execute) {
-        Remove-Item $t.FullName -Force
+    # Safety: Backup before delete
+    $backupName = "backup_" + $t.Name
+    $backupPath = Join-Path $backupDir $backupName
+    Copy-Item $t.FullName $backupPath -Force
+    Remove-Item $t.FullName -Force
         $deleted += $t.FullName
-        Write-Host "Gelöscht: $($t.FullName)" -ForegroundColor Red
+    Write-Host "Geloescht: $($t.FullName)" -ForegroundColor Red
     } else {
         Write-Host "SIMULATE DELETE: $($t.FullName)" -ForegroundColor Yellow
     }
 }
 
 if ($Execute) {
-    Write-Host "Gesamt gelöscht: $($deleted.Count) Dateien" -ForegroundColor Green
+    Write-Host "Gesamt geloescht: $($deleted.Count) Dateien" -ForegroundColor Green
 } else {
     Write-Host "Simulation beendet. Für echte Bereinigung: .\cleanup-now.ps1 -Execute" -ForegroundColor Cyan
 }
