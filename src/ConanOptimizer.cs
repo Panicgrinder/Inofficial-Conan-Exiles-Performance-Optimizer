@@ -401,10 +401,24 @@ namespace ConanExilesOptimizer
         
         private void UpdateStatus()
         {
-            steamStatusLabel.Text = "✅ Steam gefunden: C:\\Program Files (x86)\\Steam";
-            conanStatusLabel.Text = "✅ Conan Exiles gefunden: F:\\Steam\\steamapps\\common\\Conan Exiles";
-            modStatusLabel.Text = "📦 Aktive Mods: 3 erkannt";
-            systemStatusLabel.Text = "💻 System: 16GB RAM, 966GB frei";
+            // Steam-/Conan-Status bleibt wie bisher gesetzt
+            try
+            {
+                var memInfo = new Microsoft.VisualBasic.Devices.ComputerInfo();
+                double ramGB = memInfo.TotalPhysicalMemory / (1024.0 * 1024.0 * 1024.0);
+
+                var systemDrive = new DriveInfo(Path.GetPathRoot(Environment.SystemDirectory));
+                double freeDiskGB = systemDrive.AvailableFreeSpace / (1024.0 * 1024.0 * 1024.0);
+
+                systemStatusLabel.Text = $"💻 System: {ramGB:F0} GB RAM, {freeDiskGB:F0} GB frei";
+                systemStatusLabel.ForeColor = Color.LightGray;
+            }
+            catch
+            {
+                systemStatusLabel.Text = "💻 System: Informationen nicht verfügbar";
+                systemStatusLabel.ForeColor = Color.Gray;
+            }
+
             performanceLabel.Text = "⚡ Performance-Status: Bereit für Optimierung";
             performanceLabel.ForeColor = Color.LightGreen;
         }

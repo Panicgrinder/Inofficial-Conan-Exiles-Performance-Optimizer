@@ -445,19 +445,14 @@ namespace ConanOptimizer
                 performanceLabel.ForeColor = Color.Gray;
             }
             
-            // System info mit Version
+            // System info mit Version (ComputerInfo statt WMI)
             try
             {
-                var searcher = new ManagementObjectSearcher("SELECT TotalPhysicalMemory FROM Win32_ComputerSystem");
-                foreach (ManagementObject obj in searcher.Get())
-                {
-                    long totalRAM = Convert.ToInt64(obj["TotalPhysicalMemory"]);
-                    double ramGB = totalRAM / (1024.0 * 1024.0 * 1024.0);
-                    
-                    systemStatusLabel.Text = $"💻 System: {ramGB:F1} GB RAM | {AppName} {AppVersion}";
-                    systemStatusLabel.ForeColor = ramGB >= 16 ? Color.Green : Color.Orange;
-                    break;
-                }
+                var memInfo = new Microsoft.VisualBasic.Devices.ComputerInfo();
+                double ramGB = memInfo.TotalPhysicalMemory / (1024.0 * 1024.0 * 1024.0);
+
+                systemStatusLabel.Text = $"💻 System: {ramGB:F1} GB RAM | {AppName} {AppVersion}";
+                systemStatusLabel.ForeColor = ramGB >= 16 ? Color.Green : Color.Orange;
             }
             catch
             {

@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+  <AssemblyTitle>Conan Exiles Optimizer – Official Beta</AssemblyTitle>
+  <AssemblyDescription>Official Beta of the Conan Exiles Performance Optimizer</AssemblyDescription>
+  <AssemblyCompany>Panicgrinder</AssemblyCompany>
+  <AssemblyProduct>Conan Exiles Optimizer (Official Beta)</AssemblyProduct>
+  <AssemblyVersion>3.3.0.0</AssemblyVersion>
+  <FileVersion>3.3.0.0</FileVersion>
+  <AssemblyInformationalVersion>3.3.0-beta</AssemblyInformationalVersion>
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.VisualBasic" Version="10.3.0" />
+  </ItemGroup>
+
+</Project>
