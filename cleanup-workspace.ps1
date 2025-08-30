@@ -41,6 +41,18 @@ foreach ($build in $allBuilds) {
     }
 }
 
+# Zusätzlich: historisches Root-Build-Skript separat erfassen
+$rootBuild = $null
+if (Test-Path "build.ps1") {
+    $rootBuild = Get-Item "build.ps1"
+    Write-Host "   ❌ REDUNDANT: build.ps1" -ForegroundColor Red
+    if (-not $Simulate) {
+        $backupName = "backup_build.ps1"
+        Copy-Item $rootBuild.FullName $backupName
+        Write-Host "     📁 Backup: $backupName" -ForegroundColor Gray
+    }
+}
+
 # PHASE 2: IDENTIFIZIERE REDUNDANTE TEST-SCRIPTS  
 Write-Host ""
 Write-Host "📋 ANALYSE: Test-Scripts" -ForegroundColor Yellow
@@ -64,10 +76,12 @@ Write-Host ""
 Write-Host "📋 ANALYSE: Dokumentation" -ForegroundColor Yellow
 
 $docFiles = @()
+# Root-Duplikate bekannter Dateien
 $docFiles += Get-ChildItem "ERWEITERTE-EINSTELLUNGEN.md" -ErrorAction SilentlyContinue
-$docFiles += Get-ChildItem "releases\*\ERWEITERTE-EINSTELLUNGEN.md" -ErrorAction SilentlyContinue
 $docFiles += Get-ChildItem "ALLE-VERSIONEN-ÜBERSICHT.md" -ErrorAction SilentlyContinue
-$docFiles += Get-ChildItem "releases\*\ALLE-VERSIONEN-ÜBERSICHT.md" -ErrorAction SilentlyContinue
+$docFiles += Get-ChildItem "BENUTZER-ANLEITUNG.md" -ErrorAction SilentlyContinue
+# Alle Markdown-Dateien in Releases (jegliche README/Anleitungen)
+$docFiles += Get-ChildItem "releases\*\*.md" -ErrorAction SilentlyContinue
 
 $masterDoc = "modules\documentation\"
 Write-Host "   Master-Quelle: $masterDoc" -ForegroundColor Green
@@ -89,7 +103,7 @@ foreach ($doc in $docFiles) {
 Write-Host ""
 Write-Host "📊 ZUSAMMENFASSUNG:" -ForegroundColor Cyan
 
-$redundantBuilds = ($allBuilds | Where-Object { $_.Name -ne $keepBuild }).Count
+$redundantBuilds = ($allBuilds | Where-Object { $_.Name -ne $keepBuild }).Count + ([int]([bool]$rootBuild))
 $redundantTests = $allTests.Count
 $redundantDocs = ($docFiles | Where-Object { $_.FullName -notlike "*modules\documentation*" }).Count
 
@@ -116,6 +130,10 @@ if ($Simulate) {
                 Remove-Item $build.FullName -Force
                 Write-Host "   ❌ Gelöscht: $($build.Name)" -ForegroundColor Red
             }
+        }
+        if ($rootBuild) {
+            Remove-Item $rootBuild.FullName -Force
+            Write-Host "   ❌ Gelöscht: build.ps1" -ForegroundColor Red
         }
         
         # Lösche redundante Tests
