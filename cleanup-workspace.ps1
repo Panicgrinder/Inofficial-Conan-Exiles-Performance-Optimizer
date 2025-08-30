@@ -3,7 +3,8 @@
 
 param(
     [switch]$Execute,
-    [switch]$Force
+    [switch]$Force,
+    [switch]$PurgeUIBackups
 )
 
 # Zentrales Backup-Verzeichnis fuer Bereinigungen
@@ -130,6 +131,16 @@ foreach ($doc in $docFiles) {
     }
 }
 
+# PHASE 3b: UI-DOKU-BACKUPS IM BACKUP-ORDNER
+Write-Host ""
+Write-Host "ANALYSE: UI-Dokumentations-Backups" -ForegroundColor Yellow
+
+$uiBackupDocs = @()
+if (Test-Path -LiteralPath $backupDir) {
+    $uiBackupDocs = Get-ChildItem -Path $backupDir -File -Filter 'backup_doc_*.md' -ErrorAction SilentlyContinue
+}
+Write-Host ("   Gefunden: {0} UI-Backup-Dokumente" -f ($uiBackupDocs.Count)) -ForegroundColor Cyan
+
 # PHASE 4: ZUSAMMENFASSUNG
 Write-Host ""
 Write-Host "ZUSAMMENFASSUNG:" -ForegroundColor Cyan
@@ -137,11 +148,13 @@ Write-Host "ZUSAMMENFASSUNG:" -ForegroundColor Cyan
 $redundantBuilds = ($allBuilds | Where-Object { $_.Name -ne $keepBuild }).Count + ([int]([bool]$rootBuild))
 $redundantTests = $allTests.Count
 $redundantDocs = ($docFiles | Where-Object { $_.FullName -notlike '*modules\documentation*' }).Count
+$uiBackupCount = $uiBackupDocs.Count
 
 Write-Host ("   Redundante Build-Scripts: {0}" -f $redundantBuilds) -ForegroundColor Yellow
 Write-Host ("   Redundante Test-Scripts: {0}" -f $redundantTests) -ForegroundColor Yellow  
 Write-Host ("   Redundante Dokumentation: {0}" -f $redundantDocs) -ForegroundColor Yellow
-Write-Host ("   Gesamt zu bereinigen: {0} Dateien" -f ($redundantBuilds + $redundantTests + $redundantDocs)) -ForegroundColor Cyan
+Write-Host ("   UI-Backup-Dokumente: {0}" -f $uiBackupCount) -ForegroundColor Yellow
+Write-Host ("   Gesamt zu bereinigen: {0} Dateien" -f ($redundantBuilds + $redundantTests + $redundantDocs + $uiBackupCount)) -ForegroundColor Cyan
 
 if ($Simulate) {
     Write-Host ""
@@ -187,6 +200,16 @@ if ($Simulate) {
                 Remove-Item $doc.FullName -Force
                 Write-Host ("   Geloescht: {0}" -f $doc.FullName) -ForegroundColor Red
             }
+        }
+
+        # Lösche UI-Backup-Dokumente im Backup-Ordner (nur wenn explizit gewuenscht)
+        if ($PurgeUIBackups -and $uiBackupDocs -and $uiBackupDocs.Count -gt 0) {
+            foreach ($b in $uiBackupDocs) {
+                Remove-Item -LiteralPath $b.FullName -Force
+                Write-Host ("   Geloescht (UI-Backup): {0}" -f $b.Name) -ForegroundColor Red
+            }
+        } elseif ($uiBackupDocs.Count -gt 0) {
+            Write-Host "   Hinweis: UI-Backups nicht geloescht (verwende -PurgeUIBackups)" -ForegroundColor DarkYellow
         }
         
         Write-Host ""
