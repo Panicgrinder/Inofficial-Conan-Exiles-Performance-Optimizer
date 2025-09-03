@@ -3,6 +3,9 @@
         {
             "name": "🗡️ Conan Exiles Optimizer",
             "path": "."
+        },
+        {
+            "path": "../Steam/steamapps/common"
         }
     ],
     "settings": {

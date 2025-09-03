@@ -1,7 +1,9 @@
 using System;
 using System.IO;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
+using ConanOptimizer;
 
 namespace ConanExilesOptimizer
 {
@@ -368,41 +370,100 @@ namespace ConanExilesOptimizer
         {
             LogMessage("🔧 Starte Optimierung...");
             statusLabel.Text = "Optimierung gestartet";
-            MessageBox.Show("Optimierung wurde gestartet!", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            try
+            {
+                var findings = ConfigRepair.ScanForNpcAiOverrides(out var eIni, out var gIni).ToList();
+                if (findings.Count == 0)
+                {
+                    LogMessage("ℹ️ Keine relevanten Overrides gefunden.");
+                }
+                else
+                {
+                    foreach (var f in findings.Take(10)) LogMessage("• " + f);
+                }
+
+                var repaired = ConfigRepair.RepairNpcAiOverrides();
+                if (repaired)
+                {
+                    LogMessage("✅ Optimierung abgeschlossen: Riskante Overrides entfernt (Backups erstellt). Bitte Spiel neu starten.");
+                    statusLabel.Text = "Optimierung abgeschlossen";
+                    MessageBox.Show("Optimierung abgeschlossen. Backups wurden erstellt.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    LogMessage("⚠️ Optimierung: Keine Änderungen (evtl. Dateien nicht gefunden).");
+                    statusLabel.Text = "Optimierung ohne Änderungen";
+                    MessageBox.Show("Keine Änderungen vorgenommen (evtl. Dateien nicht gefunden).", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                LogMessage($"❌ Optimierung fehlgeschlagen: {ex.Message}");
+                statusLabel.Text = "Optimierung fehlgeschlagen";
+                MessageBox.Show("Optimierung fehlgeschlagen. Details im Log.", "Fehler", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void MonitorButton_Click(object sender, EventArgs e)
         {
             LogMessage("📊 Starte Performance-Monitoring...");
             statusLabel.Text = "Monitoring gestartet";
-            MessageBox.Show("Performance-Monitor wird gestartet!", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("Monitoring-Stub: Kommt bald.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void LaunchButton_Click(object sender, EventArgs e)
         {
             LogMessage("🎮 Starte Conan Exiles...");
             statusLabel.Text = "Spielstart initiiert";
-            MessageBox.Show("Conan Exiles wird gestartet!", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            try
+            {
+                var exe = PathHelper.GetConanExecutablePath();
+                if (!string.IsNullOrEmpty(exe) && File.Exists(exe))
+                {
+                    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                    {
+                        FileName = exe,
+                        UseShellExecute = true,
+                        WorkingDirectory = Path.GetDirectoryName(exe)
+                    });
+                    LogMessage($"🚀 Spiel gestartet (Exe): {exe}");
+                }
+                else
+                {
+                    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                    {
+                        FileName = "steam://run/440900",
+                        UseShellExecute = true
+                    });
+                    LogMessage("🚀 Spiel via Steam-URI gestartet (440900)");
+                }
+            }
+            catch (Exception ex)
+            {
+                LogMessage($"❌ Spielstart fehlgeschlagen: {ex.Message}");
+                statusLabel.Text = "Spielstart fehlgeschlagen";
+                MessageBox.Show("Spielstart fehlgeschlagen. Bitte Steam/Installation prüfen.", "Fehler", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void RefreshButton_Click(object sender, EventArgs e)
         {
             LogMessage("🔄 Aktualisiere Status...");
             UpdateStatus();
-            statusLabel.Text = "Status aktualisiert";
+            // statusLabel.Text = "Status aktualisiert";
         }
 
         private void AdvancedButton_Click(object sender, EventArgs e)
         {
             LogMessage("⚙️ Öffne erweiterte Einstellungen...");
-            statusLabel.Text = "Erweiterte Einstellungen";
+            // statusLabel.Text = "Erweiterte Einstellungen";
             MessageBox.Show("Erweiterte Einstellungen werden implementiert...", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void HelpButton_Click(object sender, EventArgs e)
         {
             LogMessage("❓ Zeige Hilfe...");
-            statusLabel.Text = "Hilfe geöffnet";
+            // statusLabel.Text = "Hilfe geöffnet";
             ShowAbout();
         }
 
@@ -432,6 +493,46 @@ namespace ConanExilesOptimizer
 
             performanceLabel.Text = "\u26a1 Performance-Status: Bereit fuer Optimierung";
             performanceLabel.ForeColor = Color.LightGreen;
+
+            // Zusätzlicher Schritt: Scan & optionale Reparatur von riskanten NPC/AI Overrides
+            try
+            {
+                // Pfade protokollieren
+                var savedCfg = PathHelper.GetConanSavedConfigPath();
+                var installPath = PathHelper.GetConanExilesPath();
+                LogMessage($"\ud83d\udd0e Pfade: SavedConfig={(savedCfg ?? "n/a")}, Install={(installPath ?? "n/a")}");
+
+                var findings = ConfigRepair.ScanForNpcAiOverrides(out var engineIni, out var gameIni).ToList();
+                if (findings.Count > 0)
+                {
+                    LogMessage($"\ud83d\udea8 Konfiguration geprueft (Engine.ini/Game.ini).");
+                    foreach (var f in findings.Take(5)) LogMessage("• " + f);
+                    // Automatische Reparatur anbieten/ausführen (konservativ: einmalig hier ausführen)
+                    if (findings.Any(f => f.Contains("verdächtig", StringComparison.OrdinalIgnoreCase)))
+                    {
+                        var repaired = ConfigRepair.RepairNpcAiOverrides();
+                        LogMessage(repaired
+                            ? "✅ Problematische Overrides entfernt (Backups neben den Dateien). Bitte Spiel neu starten."
+                            : "❌ Reparatur fehlgeschlagen. Bitte Dateien manuell pruefen.");
+                        statusLabel.Text = repaired ? "Reparatur abgeschlossen" : "Reparatur fehlgeschlagen";
+                    }
+                    else
+                    {
+                        LogMessage("ℹ️ Keine problematischen Overrides erkannt.");
+                        statusLabel.Text = "Scan abgeschlossen";
+                    }
+                }
+                else
+                {
+                    LogMessage("ℹ️ Keine problematischen Overrides erkannt.");
+                    statusLabel.Text = "Scan abgeschlossen";
+                }
+            }
+            catch (Exception ex)
+            {
+                LogMessage($"Reparatur-Scan Fehler: {ex.Message}");
+                statusLabel.Text = "Scan-Fehler";
+            }
         }
 
         private void LogMessage(string message)
